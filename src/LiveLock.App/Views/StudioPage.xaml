@@ -1,0 +1,102 @@
+<Page x:Class="LiveLock.App.Views.StudioPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+    <Border Padding="24">
+    <Grid ColumnSpacing="24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="340" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Preview: wallpaper layer, then overlay layer. They are independent siblings. -->
+        <Grid Grid.Column="0" RowSpacing="12">
+            <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <Border CornerRadius="16" Background="#101014" x:Name="PreviewHost" SizeChanged="Preview_SizeChanged">
+                <Grid x:Name="PreviewGrid">
+                    <Grid.Clip><RectangleGeometry x:Name="PreviewClip" /></Grid.Clip>
+                    <Grid x:Name="DemoBackground">
+                        <Grid.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#1B2A49" Offset="0" />
+                                <GradientStop Color="#4B2E6F" Offset="0.55" />
+                                <GradientStop Color="#C2576B" Offset="1" />
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+                    <Image x:Name="ImageLayer" Visibility="Collapsed" />
+                    <MediaPlayerElement x:Name="VideoLayer" Visibility="Collapsed" AreTransportControlsEnabled="False" AutoPlay="False" />
+
+                    <Grid x:Name="OverlayLayer" IsHitTestVisible="False">
+                        <Rectangle x:Name="DimLayer" Fill="Black" />
+                        <Rectangle x:Name="GradientLayer" VerticalAlignment="Top" Height="420">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#FF000000" Offset="0" />
+                                    <GradientStop Color="#00000000" Offset="1" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <StackPanel x:Name="ClockPanel" VerticalAlignment="Top" Margin="32,0" SizeChanged="ClockPanel_SizeChanged">
+                            <TextBlock x:Name="DateBlock" />
+                            <TextBlock x:Name="TimeBlock" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="PlayPauseButton" Click="PlayPause_Click" ToolTipService.ToolTip="Play or pause the video preview"
+                        AutomationProperties.Name="Play or pause" Content="Pause" />
+                <TextBlock x:Name="WallpaperLabel" VerticalAlignment="Center" Opacity="0.7" />
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Column="1" Padding="0,0,12,0">
+            <StackPanel Spacing="14">
+                <TextBlock Text="Studio" Style="{StaticResource TitleTextBlockStyle}" />
+                <ComboBox x:Name="PresetBox" Header="Preset" HorizontalAlignment="Stretch" SelectionChanged="PresetBox_SelectionChanged" />
+
+                <TextBlock Text="Clock" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" />
+                <ToggleSwitch Header="Show clock" IsOn="{x:Bind VM.ShowClock, Mode=TwoWay}" />
+                <ToggleSwitch Header="24-hour time" IsOn="{x:Bind VM.Use24Hour, Mode=TwoWay}" />
+                <ToggleSwitch Header="Show AM/PM (12-hour)" IsOn="{x:Bind VM.ShowAmPm, Mode=TwoWay}" />
+                <ComboBox Header="Font" HorizontalAlignment="Stretch" ItemsSource="{x:Bind VM.FontChoices}" SelectedItem="{x:Bind VM.FontFamily, Mode=TwoWay}" />
+                <Slider Header="Size" Minimum="40" Maximum="300" Value="{x:Bind VM.FontSize, Mode=TwoWay}" />
+                <Slider Header="Weight" Minimum="100" Maximum="900" StepFrequency="100" TickFrequency="100" TickPlacement="Outside" Value="{x:Bind VM.FontWeight, Mode=TwoWay}" />
+                <Slider Header="Opacity" Minimum="10" Maximum="100" Value="{x:Bind VM.ClockOpacity, Mode=TwoWay}" />
+                <ComboBox Header="Alignment" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind VM.AlignmentIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="Left" /><ComboBoxItem Content="Center" /><ComboBoxItem Content="Right" />
+                </ComboBox>
+                <Slider Header="Vertical position" Minimum="0" Maximum="100" Value="{x:Bind VM.VerticalPosition, Mode=TwoWay}" />
+                <DropDownButton Content="Color" AutomationProperties.Name="Clock color">
+                    <DropDownButton.Flyout>
+                        <Flyout>
+                            <ColorPicker x:Name="ClockColorPicker" IsAlphaEnabled="False" ColorChanged="ClockColorPicker_ColorChanged" />
+                        </Flyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <TextBlock Text="Date" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" />
+                <ToggleSwitch Header="Show date" IsOn="{x:Bind VM.ShowDate, Mode=TwoWay}" />
+                <ToggleSwitch Header="Weekday" IsOn="{x:Bind VM.ShowWeekday, Mode=TwoWay}" />
+                <ToggleSwitch Header="Day" IsOn="{x:Bind VM.ShowDay, Mode=TwoWay}" />
+                <ToggleSwitch Header="Month" IsOn="{x:Bind VM.ShowMonth, Mode=TwoWay}" />
+                <ToggleSwitch Header="Year" IsOn="{x:Bind VM.ShowYear, Mode=TwoWay}" />
+                <ToggleSwitch Header="Abbreviated names" IsOn="{x:Bind VM.AbbreviatedNames, Mode=TwoWay}" />
+
+                <TextBlock Text="Wallpaper" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" />
+                <ToggleSwitch Header="Show overlay (clock, dimming, gradient)" IsOn="{x:Bind VM.ShowOverlay, Mode=TwoWay}" />
+                <Slider Header="Background dimming" Minimum="0" Maximum="90" Value="{x:Bind VM.Dimming, Mode=TwoWay}" />
+                <Slider Header="Gradient intensity" Minimum="0" Maximum="100" Value="{x:Bind VM.Gradient, Mode=TwoWay}" />
+                <ComboBox Header="Scaling" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind VM.ScalingIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="Cover (crop to fill)" /><ComboBoxItem Content="Contain (fit)" /><ComboBoxItem Content="Stretch" />
+                </ComboBox>
+                <ToggleSwitch Header="Loop video" IsOn="{x:Bind VM.Loop, Mode=TwoWay}" />
+                <ToggleSwitch Header="Mute video" IsOn="{x:Bind VM.Muted, Mode=TwoWay}" />
+
+                <Button Content="Reset to defaults" Click="Reset_Click" HorizontalAlignment="Stretch" Margin="0,8,0,24" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+    </Border>
+</Page>

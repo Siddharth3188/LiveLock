@@ -1,0 +1,91 @@
+<Page x:Class="LiveLock.App.Views.LibraryPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:vm="using:LiveLock.App.ViewModels">
+    <!-- Outer Grid is the drop target; padding lives on a Border. -->
+    <Grid AllowDrop="True" DragOver="Page_DragOver" Drop="Page_Drop" Background="Transparent">
+        <Border Padding="32,24">
+            <Grid RowSpacing="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="Wallpaper Library" Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock Text="Your media stays where it is — LiveLock only keeps a reference." Opacity="0.7" />
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Click="Import_Click"
+                            AutomationProperties.Name="Import media" Style="{StaticResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE710;" FontSize="14" />
+                            <TextBlock Text="Import media" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <InfoBar x:Name="Status" Grid.Row="1" IsOpen="False" IsClosable="True" />
+
+                <GridView x:Name="LibraryGrid" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="LibraryGrid_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LibraryItemViewModel">
+                            <Border Width="240" Margin="6" CornerRadius="12"
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    AutomationProperties.Name="{x:Bind Name}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="135" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Border Background="#202020" CornerRadius="11,11,0,0">
+                                        <Grid>
+                                            <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                                            <Border Visibility="{x:Bind MissingVisibility, Mode=OneWay}" Background="#CC000000">
+                                                <TextBlock Text="File missing" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border Visibility="{x:Bind SelectedVisibility, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8"
+                                                    Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="6" Padding="8,2">
+                                                <TextBlock Text="Selected" FontSize="12" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Row="1" Padding="12,8">
+                                        <Grid ColumnSpacing="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                                <TextBlock Text="{x:Bind TypeText}" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="12" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Click="Locate_Click" Visibility="{x:Bind MissingVisibility, Mode=OneWay}"
+                                                    ToolTipService.ToolTip="Locate the missing file" AutomationProperties.Name="Locate file">
+                                                <FontIcon Glyph="&#xE838;" FontSize="14" />
+                                            </Button>
+                                            <Button Grid.Column="2" Click="Remove_Click" ToolTipService.ToolTip="Remove from library (original file is kept)"
+                                                    AutomationProperties.Name="Remove from library">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+
+                <StackPanel x:Name="EmptyState" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="Collapsed">
+                    <FontIcon Glyph="&#xE8B9;" FontSize="48" Opacity="0.5" />
+                    <TextBlock Text="Your library is empty" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Import a video, GIF or image — or drag files here." Opacity="0.7" HorizontalAlignment="Center" />
+                    <Button Content="Import media" Click="Import_Click" HorizontalAlignment="Center" Style="{StaticResource AccentButtonStyle}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
