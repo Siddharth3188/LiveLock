@@ -1,0 +1,38 @@
+
+name: LiveLock CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test LiveLock
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Show .NET information
+        run: dotnet --info
+
+      - name: Restore dependencies
+        run: dotnet restore LiveLock.sln
+
+      - name: Build solution
+        run: dotnet build LiveLock.sln --configuration Release --no-restore -p:Platform=x64
+
+      - name: Run Core tests
+        run: dotnet test tests/LiveLock.Core.Tests/LiveLock.Core.Tests.csproj --configuration Release --no-restore
